@@ -12,7 +12,25 @@ import { ThemeSwitch } from "@/components/theme-switch";
 export const metadata: Metadata = {
   title: "Cek Khodam Online - Powered by Google Generative AI",
   description: "Cek khodam yang ada pada tubuh seseorang melalui nama.",
-  keywords: ["cek khodam", "khodam", "cek khodam ai", "cek khodam online"],
+  keywords: [
+    "cek khodam",
+    "khodam",
+    "cek khodam ai",
+    "cek khodam online",
+    "website cek khodam",
+    "cek khodam nama",
+    "cek khodam tubuh",
+    "cek khodam orang",
+    "cek khodam orang lain",
+    "cek khodam seseorang",
+    "cek khodam orang lain online",
+    "cek khodam orang lain gratis",
+    "check khodam",
+    "khodam check",
+    "khodam check online",
+    "check khodam online",
+    "check khodam nama",
+  ],
   authors: [
     {
       name: "Coding with Afrizal",
@@ -34,6 +52,7 @@ export const metadata: Metadata = {
       },
     ],
     locale: "id_ID",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
