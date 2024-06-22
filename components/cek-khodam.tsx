@@ -66,7 +66,7 @@ export default function CheckKhodam() {
     );
 
   return (
-    <Card className="min-w-[400px] max-w-[450px] md:max-w-[500px] relative">
+    <Card className="min-w-[350px] max-w-[450px] relative">
       <CardHeader className="flex flex-col">
         {!error && !isLoading && messages.length > 0 && (
           <div className="flex-grow p-2">

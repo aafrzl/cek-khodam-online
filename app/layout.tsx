@@ -10,7 +10,7 @@ import { fontSans } from "@/config/fonts";
 import { ThemeSwitch } from "@/components/theme-switch";
 
 export const metadata: Metadata = {
-  title: "Cek Khodam Online - Powered by Google Generative AI",
+  title: "Cek Khodam Online",
   description: "Cek khodam yang ada pada tubuh seseorang melalui nama.",
   keywords: [
     "cek khodam",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   ],
   creator: "Coding with Afrizal",
   openGraph: {
-    title: "Cek Khodam Online - Powered by Google Generative AI",
+    title: "Cek Khodam Online",
     description: "Cek khodam yang ada pada tubuh seseorang melalui nama.",
     url: `${process.env.HOST_APP_URL}`,
     siteName: "Cek Khodam Online",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
         url: `${process.env.SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Cek Khodam Online - Powered by Google Generative AI",
+        alt: "Cek Khodam Online",
       },
     ],
     locale: "id_ID",
@@ -57,13 +57,13 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "Cek Khodam Online",
-    title: "Cek Khodam Online - Powered by Google Generative AI",
+    title: "Cek Khodam Online",
     description: "Cek khodam yang ada pada tubuh seseorang melalui nama.",
     creator: "@aafrzl_",
     images: [
       {
         url: `${process.env.SITE_URL}/og-image.png`,
-        alt: "Cek Khodam Online - Powered by Google Generative AI",
+        alt: "Cek Khodam Online",
       },
     ],
   },
