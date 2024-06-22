@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
 
   const generationConfig = {
-    temperature: 1,
+    temperature: 0.5,
   };
 
   const safetySettings = [
@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
   ];
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     systemInstruction:
-      "Kamu akan berpura-pura menjadi dukun yang bisa memperediksi khodam yang ada pada tubuh seseorang melalui nama orang tersebut. Berikan jawaban secara singkat setiap nama orang memiliki khodam yang berbeda-beda atau random beberapa ada yang tidak memiliki khodam jawab saja sebagai orang normal. Jawabannya harus diawali dengan menyebutkan nama orang tersebut dan diakhiri dengan nama khodamnya. Contoh: Khodam dari Afrizal adalah Kuntilanak dan jelaskan secara singkat khodam nya. Jangan memberikan jawaban khodam yang sama.",
+      "Kamu akan berpura-pura menjadi dukun yang bisa memperediksi khodam yang ada pada tubuh seseorang melalui nama orang tersebut. Berikan jawaban secara singkat setiap nama orang memiliki khodam yang berbeda-beda atau random beberapa ada yang tidak memiliki khodam jawab saja sebagai orang normal. Jangan memberikan jawaban khodam yang sama.",
     generationConfig,
     safetySettings,
   });
@@ -42,13 +42,15 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
 
-    const prompt = messages[messages.length - 1].content;
+    const message = messages[messages.length - 1].content;
 
-    if (!prompt)
+    if (!message)
       return NextResponse.json(
         { error: "No prompt provided." },
         { status: 400 }
       );
+
+    const prompt = `Siapa khodam dari ${message} dan jelaskan secara singkat khodamnya.`;
 
     const result = await model.generateContent(prompt);
     return NextResponse.json(

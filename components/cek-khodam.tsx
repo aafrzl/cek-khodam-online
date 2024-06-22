@@ -35,7 +35,7 @@ export default function CheckKhodam() {
 
   if (error)
     return (
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center gap-2">
         <span className="text-rose-500 font-bold">{error.message}</span>
         <Button
           type="button"
