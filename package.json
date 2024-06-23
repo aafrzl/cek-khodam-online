@@ -9,6 +9,7 @@
 		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
 	},
 	"dependencies": {
+		"@ai-sdk/google": "^0.0.23",
 		"@ai-sdk/react": "^0.0.5",
 		"@google/generative-ai": "^0.13.0",
 		"@nextui-org/button": "2.0.34",
@@ -31,7 +32,9 @@
 		"@typescript-eslint/eslint-plugin": "^7.10.0",
 		"@typescript-eslint/parser": "^7.10.0",
 		"@upstash/ratelimit": "^1.2.1",
+		"@upstash/redis": "^1.31.6",
 		"@vercel/kv": "^2.0.0",
+		"ai": "^3.2.5",
 		"autoprefixer": "10.4.19",
 		"clsx": "^2.1.1",
 		"eslint": "^8.56.0",

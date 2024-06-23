@@ -1,52 +1,22 @@
-import {
-  GoogleGenerativeAI,
-  HarmBlockThreshold,
-  HarmCategory,
-} from "@google/generative-ai";
-import { NextRequest, NextResponse } from "next/server";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ratelimit } from "@upstash/ratelimit";
 import { kv } from "@vercel/kv";
+import { generateText } from "ai";
+import { NextRequest, NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
-
-const generationConfig = {
-  stopSequences: ["red"],
-  maxOutputTokens: 200,
-  temperature: 0.5,
-  topP: 1,
-  topK: 40,
-};
-
-const safetySettings = [
-  {
-    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-    threshold: HarmBlockThreshold.BLOCK_NONE,
-  },
-  {
-    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-    threshold: HarmBlockThreshold.BLOCK_NONE,
-  },
-  {
-    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-  },
-  {
-    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-  },
-];
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-pro",
-  systemInstruction:
-    "Kamu akan berpura-pura menjadi dukun yang bisa memperediksi khodam yang ada pada tubuh seseorang melalui nama orang tersebut. Berikan jawaban secara singkat dan lucu setiap nama orang memiliki khodam yang berbeda-beda atau random beberapa ada yang tidak memiliki khodam jawab saja sebagai orang normal. Jangan memberikan jawaban khodam yang sama.",
-  generationConfig,
-  safetySettings,
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 const rateLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(5, "10s"),
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(2, "60s"), // 2 requests per 60 seconds
+});
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_API_KEY,
 });
 
 export const runtime = "edge";
@@ -70,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (remaining === 0) {
       return NextResponse.json(
         {
-          error:
+          messages:
             "Kamu telah mencapai batas permintaan. Silakan coba lagi nanti.",
         },
         {
@@ -83,19 +53,48 @@ export async function POST(req: NextRequest) {
         }
       );
     } else {
-      const prompt = `Siapa khodam dari ${message} dan jelaskan secara singkat khodamnya.`;
+      const { text } = await generateText({
+        model: google("models/gemini-1.5-flash-latest", {
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_ONLY_HIGH",
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_ONLY_HIGH",
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_ONLY_HIGH",
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_ONLY_HIGH",
+            },
+          ],
+        }),
+        system:
+          "Kamu akan berpura-pura menjadi dukun yang bisa memperediksi khodam yang ada pada tubuh seseorang melalui nama orang tersebut. Berikan jawaban secara singkat dan lucu setiap nama orang memiliki khodam yang berbeda-beda atau random beberapa ada yang tidak memiliki khodam jawab saja sebagai orang normal. Jangan memberikan jawaban khodam yang sama.",
+        prompt: `Siapa khodam dari ${message} dan jelaskan secara singkat khodamnya.`,
+        maxTokens: 200,
+        temperature: 0.5,
+      });
 
-      const result = await model.generateContent(prompt);
       return NextResponse.json(
-        { messages: result.response.text() },
-        { status: 200 }
+        {
+          messages: text,
+        },
+        {
+          headers: {
+            "X-RateLimit-Limit": limit.toString(),
+            "X-RateLimit-Remaining": remaining.toString(),
+            "X-RateLimit-Reset": reset.toString(),
+          },
+        }
       );
     }
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
   }
 }
