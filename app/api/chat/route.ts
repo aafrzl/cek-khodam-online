@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       );
     } else {
       const { text } = await generateText({
-        model: google("models/gemini-1.5-flash-latest", {
+        model: google("models/gemini-1.5-pro-latest", {
           safetySettings: [
             {
               category: "HARM_CATEGORY_HARASSMENT",
@@ -81,20 +81,15 @@ export async function POST(req: NextRequest) {
         temperature: 0.5,
       });
 
-      return NextResponse.json(
-        {
-          messages: text,
-        },
-        {
-          headers: {
-            "X-RateLimit-Limit": limit.toString(),
-            "X-RateLimit-Remaining": remaining.toString(),
-            "X-RateLimit-Reset": reset.toString(),
-          },
-        }
-      );
+      return NextResponse.json({
+        messages: text,
+      });
     }
   } catch (error) {
     console.error(error);
+    return NextResponse.json(
+      { messages: "Terjadi kesalahan pada server, Mohon tunggu beberapa saat" },
+      { status: 500 }
+    );
   }
 }
