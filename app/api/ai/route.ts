@@ -1,9 +1,8 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import { generateText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -12,7 +11,7 @@ const redis = new Redis({
 
 const rateLimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(2, "60s"), // 2 requests per 60 seconds
+  limiter: Ratelimit.slidingWindow(5, "60s"), // 2 requests per 60 seconds
 });
 
 const google = createGoogleGenerativeAI({
@@ -81,9 +80,14 @@ export async function POST(req: NextRequest) {
         temperature: 0.5,
       });
 
-      return NextResponse.json({
-        messages: text,
-      });
+      return NextResponse.json(
+        {
+          messages: text,
+        },
+        {
+          status: 200,
+        }
+      );
     }
   } catch (error) {
     console.error(error);

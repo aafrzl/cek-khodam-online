@@ -22,6 +22,7 @@ export default function CheckKhodam() {
     error,
   } = useChat({
     streamMode: "text",
+    api: "/api/ai",
   });
 
   const handleReset = () => {
@@ -36,7 +37,9 @@ export default function CheckKhodam() {
   if (error)
     return (
       <div className="flex flex-col items-center gap-2">
-        <span className="text-rose-500 font-bold">{error.message}</span>
+        <span className="text-rose-500 font-bold">
+          Terjadi kesalahan saat memeriksa khodam. Silakan coba lagi nanti.
+        </span>
         <Button
           type="button"
           color="warning"
